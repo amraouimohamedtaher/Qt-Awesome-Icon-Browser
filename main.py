@@ -17,7 +17,7 @@ VIEW_COLUMNS = 5
 AUTO_SEARCH_TIMEOUT = 500
 ALL_COLLECTIONS = 'All'
 
-
+# A Python 
 class Mainwindow(QMainWindow):
     """
     A small browser window that allows the user to search through all icons from
