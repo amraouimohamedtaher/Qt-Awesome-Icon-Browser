@@ -1,4 +1,5 @@
 import sys , qtawesome , qdarkstyle
+import colorama
 
 from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import * 
@@ -161,8 +162,10 @@ class Mainwindow(QMainWindow):
             return
 
         clipboard = QApplication.instance().clipboard()
-        clipboard.setText(indexes[0].data())
-        self.statusBar_.showMessage(f" { indexes[0].data() } Has been coppied to your clipboard ")
+        clipboard.setText( indexes[0].data())
+        self.statusBar
+        self.statusBar_.showMessage( f""" { indexes[0].data() } has been coppied to your clipboard""",2000)
+
 
 class IconListView(QListView):
     """
@@ -230,6 +233,5 @@ if __name__ == "__main__" :
     iconBrowser.setStyleSheet( qdarkstyle.load_stylesheet_pyqt5() )
     Mw = Mainwindow()
     Mw.show()
-
     sys.exit(iconBrowser.exec_())
 
