@@ -24,6 +24,7 @@ class Mainwindow(QMainWindow):
     A small browser window that allows the user to search through all icons from
     the available version of QtAwesome.  You can also copy the name and python
     code for the currently selected icon.
+    
     """
 
 
