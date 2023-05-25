@@ -1,0 +1,122 @@
+/* 
+light color : #FEFFFE ;
+dark color : #050401 ;
+extra color : #D90368 ;
+*/
+/* Global Rules */
+* 
+{
+    color: #FEFFFE ;
+}
+QToolButton , QPushButton 
+{
+    border: none;
+}
+QToolTip
+{
+    width: fit-content;
+    background-color:#050401 ;
+    border: 1px solid #D90368 ;
+    color: #FEFFFE;
+    border-radius: 3px;
+    font-size: 16px;
+
+}
+
+/* Mainwindow */
+#Mainwindow
+{
+    background-color:#050401;
+    border: 1px solid darkgrey;
+    border-radius: 5px;
+}
+/* Content Widget */
+
+#contentwidget
+{
+    background-color: transparent;
+    border: none;
+}
+/* titlebar */
+#contentwidget #titlebar
+{
+    border: 0px solid darkgrey;
+    border-bottom-width: 1px;
+}
+
+#contentwidget #titlebar  QToolButton:hover 
+{
+    color: #D90368;
+    padding: 0px;
+}
+#contentwidget #titlebar  #extBtn:hover
+{
+    border: 0px solid #D90368;
+}
+#contentwidget #titlebar #searchEdit 
+{
+    background-color: transparent;
+    border: 0px solid #D90368;
+    border-bottom-width: 1px;
+    color: #FEFFFE;
+    padding-top: 5px;
+}
+#contentwidget #CentralWidget QListView
+{
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+    padding: 5px;
+}
+#contentwidget #CentralWidget QListView::item::selected , 
+#contentwidget #CentralWidget QListView::item:hover 
+{
+    background-color: #D90368;
+    border: 1px solid #D90368;
+    border-radius: 5px;
+}
+QSizeGrip
+{
+    width: 20px;
+    height: 20px;
+}
+QScrollBar:vertical {
+    border: 0px solid #D90368;
+    border-left-width: 2px;
+    background: #050401;
+    width: 15px;
+    padding: 5px;
+}
+QScrollBar::handle:vertical {
+    background: #D90368;
+    min-height: 20px;
+
+}
+QScrollBar::add-line:vertical {
+    background-color: none;
+    border: none;
+}
+
+QScrollBar::sub-line:vertical {
+    border: none ;
+    background: none;
+}
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    border: none ;
+    background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+/* Statusbar */
+#contentwidget #statusBar
+{
+    border: 0px solid darkgray;
+    border-top-width: 1px;
+}
+#contentwidget #statusBar QLabel
+{
+    padding-left: 5px;
+    font-size: 14px;
+}
