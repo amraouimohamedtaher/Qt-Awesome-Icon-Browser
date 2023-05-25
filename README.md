@@ -2,9 +2,9 @@
 A modified standalone version of Icon Browser That's Built-in with PyQt5 
 
 ## Improvements :
-[1] ui design
-[2] much simpler code
-[3] modified titlebar
+[1] ui design <br>
+[2] much simpler code<br>
+[3] modified titlebar<br>
 ## How To Use :
 
 1 - open the app and select the prefered icon types listed on the title bar
