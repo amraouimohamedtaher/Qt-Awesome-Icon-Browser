@@ -1,16 +1,11 @@
-import sys , qtawesome , qdarkstyle
-import colorama
+import sys , qtawesome , os
+from tkinter import ALL
+from time import sleep
 
 from PyQt5.QtWidgets import * 
 from PyQt5.QtCore import * 
 from PyQt5.QtGui import * 
-
-try:
-    from ctypes import windll  # Only exists on Windows.
-    myappid = 'mycompany.myproduct.subproduct.version'
-    windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-except ImportError:
-    pass
+from qtawesome import icon 
 
 # TODO: Set icon colour and copy code with color kwarg
 
@@ -19,22 +14,27 @@ AUTO_SEARCH_TIMEOUT = 500
 ALL_COLLECTIONS = 'All'
 
 # A Python 
-class Mainwindow(QMainWindow):
+class Mainwindow(QWidget):
+    
     """
     A small browser window that allows the user to search through all icons from
     the available version of QtAwesome.  You can also copy the name and python
     code for the currently selected icon.
     
     """
-
-
+    icon_color = "white"
     def __init__(self):
         super().__init__()
         self.setupUi()
     def setupUi(self) :
-        self.setMinimumSize(400, 300)
+        self.setMinimumSize(750, 500)
         self.setWindowTitle('QtAwesome Icon Browser')
-
+        
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setLayout(QHBoxLayout())
+        self.setTheme("dark")
+        
         qtawesome._instance()
         fontMaps = qtawesome._resource['iconic'].charmap
 
@@ -54,120 +54,174 @@ class Mainwindow(QMainWindow):
         self._proxyModel = QSortFilterProxyModel()
         self._proxyModel.setSourceModel(model)
         self._proxyModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        
+        # Mainwindow
+        container = QWidget()
+        container.setObjectName("Mainwindow")
+        container.setLayout(QHBoxLayout())
+        container.layout().setContentsMargins(2,2,2,2)
+        container.layout().setSpacing(0)
+        # contentwidget 
+        contentwidget = QFrame()
+        contentwidget.setObjectName("contentwidget")
+        contentwidget.setLayout(QVBoxLayout())
+        contentwidget.layout().setContentsMargins(0,0,0,0)
+        contentwidget.layout().setSpacing(0)
+        # title bar
+        titlebar = QFrame()
+        titlebar.setObjectName("titlebar")
+        titlebar.setFixedHeight(35)
+        titlebar.setLayout(QHBoxLayout())
+        titlebar.layout().setContentsMargins(2,2,2,2)
+        #!
+        extBtn = QToolButton(clicked = lambda : self.close() )
+        extBtn.setObjectName("extBtn")
+        extBtn.setFixedSize(30,30)
+        extBtn.setIcon(icon("fa.close" , color="#D90368"))
+        extBtn.setIconSize(QSize(30,30))
+        #!
+        appBtn = QToolButton(text = "All icons" , clicked = lambda : self._triggerImmediateUpdate(ALL_COLLECTIONS))
+        appBtn.setObjectName(ALL_COLLECTIONS)
+        appBtn.setFixedHeight(30)
+        #!
+        eiBtn = QToolButton(text="ei" , clicked = lambda : self._triggerImmediateUpdate("ei") )
+        eiBtn.setObjectName("ei")
+        eiBtn.setFixedHeight(30)
+        #!
+        faBtn = QToolButton(text="fa", clicked = lambda : self._triggerImmediateUpdate("fa") )
+        faBtn.setObjectName("fa")
+        faBtn.setFixedHeight(30)
+        #!
+        fa5Btn = QToolButton(text="fa5", clicked = lambda : self._triggerImmediateUpdate("fa5") )
+        fa5Btn.setObjectName("fa5")
+        fa5Btn.setFixedHeight(30)
+        #!
+        fa5bBtn = QToolButton(text="fa5b", clicked = lambda : self._triggerImmediateUpdate("fa5b") )
+        fa5bBtn.setObjectName("fa5b")
+        fa5bBtn.setFixedHeight(30)
+        #!
+        fa5sBtn = QToolButton(text="fa5s", clicked = lambda : self._triggerImmediateUpdate("fa5s") )
+        
+        fa5sBtn.setObjectName("fa5s")
+        fa5sBtn.setFixedHeight(30)
+        #!
+        mdiBtn = QToolButton(text="mdi", clicked = lambda : self._triggerImmediateUpdate("mdi") )
+        mdiBtn.setObjectName("mdi")
+        mdiBtn.setFixedHeight(30)
+        #!
+        self.searchEdit = QLineEdit(self)
+        self._triggerImmediateUpdate(ALL_COLLECTIONS)
+        self.searchEdit.setObjectName("searchEdit")
+        self.searchEdit.setMaximumWidth(0)        
+        self.searchEdit.setPlaceholderText("Search for icon ...")
+        self.searchBtn = QToolButton(clicked = lambda : self.showSearchBar())
+        self.searchBtn.setFixedSize(28,28)
+        self.searchBtn.setIcon(icon("fa.search" , color="#D90368"))
+        self.searchBtn.setIconSize(QSize(28,28))
+        self.searchEdit.textChanged.connect(self._triggerDelayedUpdate)
+        self.searchEdit.returnPressed.connect(self._triggerImmediateUpdate)
+        #!
+        titlebar.layout().addWidget(appBtn)
+        titlebar.layout().addWidget(eiBtn)
+        titlebar.layout().addWidget(faBtn)
+        titlebar.layout().addWidget(fa5Btn)
+        titlebar.layout().addWidget(fa5bBtn)
+        titlebar.layout().addWidget(fa5sBtn)
+        titlebar.layout().addWidget(mdiBtn)
+        titlebar.layout().addWidget( QSplitter(orientation=Qt.Horizontal) )
+        titlebar.layout().addWidget(self.searchEdit)
+        titlebar.layout().addWidget(self.searchBtn)
+        titlebar.layout().addWidget(extBtn)
+        # central widget 
+        c_widget = QFrame()
+        c_widget.setObjectName("CentralWidget")
+        c_widget.setLayout(QHBoxLayout())
+        c_widget.layout().setContentsMargins(0,0,0,0)
+        self.icon_view = IconListView(self)
+        self.icon_view.setUniformItemSizes(True)
+        self.icon_view.setViewMode(QListView.IconMode)
+        self.icon_view.setModel(self._proxyModel)
+        self.icon_view.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.icon_view.doubleClicked.connect(self.updatStatusBarMessage)
+        c_widget.layout().addWidget(self.icon_view)
 
-        self._listView = IconListView(self)
-        self._listView.setUniformItemSizes(True)
-        self._listView.setViewMode(QListView.IconMode)
-        self._listView.setModel(self._proxyModel)
-        self._listView.setContextMenuPolicy(Qt.CustomContextMenu)
-        self._listView.doubleClicked.connect(self._copyIconText)
-
-        self._lineEdit = QLineEdit(self)
-        self._lineEdit.setMaximumSize(0,30)
-        self._lineEdit.textChanged.connect(self._triggerDelayedUpdate)
-        self._lineEdit.returnPressed.connect(self._triggerImmediateUpdate)
-
-        self._comboBox = QComboBox(self)
-        self._comboBox.setFixedSize(120 , 30)
-        self._comboBox.currentIndexChanged.connect(self._triggerImmediateUpdate)
-        self._comboBox.addItems([ALL_COLLECTIONS] + sorted(fontMaps.keys()))
-
-        self.spacer = QSplitter(Qt.Horizontal)
-        self.spacer.setStyleSheet("background-color : none ;")
-        self.showSearchBtn_ = QToolButton(self  )
-        self.showSearchBtn_.setFixedSize(30,30)
-        self.showSearchBtn_.clicked.connect( lambda : self.showSearchBar() )
-        self.showSearchBtn_.setIconSize(QSize(30,30))
-        self.showSearchBtn_.setIcon( qtawesome.icon( "fa.search" , color = "White" ) ) 
-        lyt = QHBoxLayout()
-        lyt.setContentsMargins(2, 2, 2, 2)
-        lyt.setSpacing(4)
-        lyt.addWidget(self.spacer)
-        lyt.addWidget(self._comboBox)
-        self.statusBar_ = QStatusBar(self)
-        self.statusBar_.setStyleSheet("background-color : none ; border : none ; ")
-        lyt.addWidget(self._lineEdit)
-        lyt.addWidget(self.showSearchBtn_ )
-        searchBarFrame = QFrame(self)
-        searchBarFrame.setFixedHeight(35)
-        searchBarFrame.setLayout(lyt)
-
+        #! Status Bar
+        self.statusBar = QFrame(self)
+        self.statusBar.setObjectName("statusBar")
+        self.statusBar.setLayout(QHBoxLayout())
+        self.statusBar.layout().setContentsMargins(0,0,0,0)
+        self.statusBar.setFixedHeight(20)
+        self.statusLabel = QLabel()
+        self.statusBar.layout().addWidget(self.statusLabel)
+        self.statusBar.layout().addWidget( QSizeGrip(self.statusBar) )
+        #! layouts
+        contentwidget.layout().addWidget(titlebar)
+        # ! contentwidget layout
+        contentwidget.layout().addWidget(c_widget)
+        contentwidget.layout().addWidget(self.statusBar)
+        # ! container layout 
+        container.layout().addWidget(contentwidget)
+        # App Layout
+        self.layout().addWidget(container)
+    def setTheme(self,theme : str ) :
+        if theme == "light" :
+            self.icon_color = "black" 
+        self.theme = open(f"{os.curdir}/themes/{theme}.css","r")
+        qApp.setStyleSheet( self.theme.read() )
+        return self.theme , self.icon_color
     
-
-        lyt = QVBoxLayout()
-        lyt.setContentsMargins(0,0,0,0)
-        lyt.addWidget(searchBarFrame)
-        lyt.addWidget(self._listView)
-        lyt.addWidget(self.statusBar_)
-        frame = QFrame(self)
-        frame.setLayout(lyt)
-
-        self.setCentralWidget(frame)
-
-        QShortcut(
-            QKeySequence(Qt.Key_Return),
-            self,
-            self._copyIconText,
-        )
-
-        self._lineEdit.setFocus()
-
-        geo = self.geometry()
-        desktop = QApplication.desktop()
-        screen = desktop.screenNumber(desktop.cursor().pos())
-        centerPoint = desktop.screenGeometry(screen).center()
-        geo.moveCenter(centerPoint)
-        self.setGeometry(geo)
     def showSearchBar(self) :
-        width =  self._lineEdit.maximumWidth() 
-        if width == 0 : self._lineEdit.setMaximumWidth(250)
-        if width == 250 : self._lineEdit.setMaximumWidth(0)
+        width =  self.searchEdit.maximumWidth() 
+        if width == 0 : self.searchEdit.setMaximumWidth(250)
+        if width == 250 : self.searchEdit.setMaximumWidth(0)
     def _updateFilter(self):
         """
         Update the string used for filtering in the proxy model with the
         current text from the line edit.
         """
         reString = ""
-
-        group = self._comboBox.currentText()
+        group = self.current_filter
         if group != ALL_COLLECTIONS:
             reString += r"^%s\." % group
 
-        searchTerm = self._lineEdit.text()
+        searchTerm = self.searchEdit.text()
         if searchTerm:
             reString += ".*%s.*$" % searchTerm
 
         self._proxyModel.setFilterRegExp(reString)
 
-    def _triggerDelayedUpdate(self):
+    def _triggerDelayedUpdate(self , filter):
         """
         Reset the timer used for committing the search term to the proxy model.
         """
         self._filterTimer.stop()
         self._filterTimer.start()
 
-    def _triggerImmediateUpdate(self):
+    def _triggerImmediateUpdate(self, group = ""):
         """
         Stop the timer used for committing the search term and update the
         proxy model immediately.
         """
-        self._filterTimer.stop()
+        self.current_filter = group
+        
+        stylesheet = "#".__str__() + group.__str__() + "{color : #D90368}".__str__()
+        self.setStyleSheet(stylesheet)
         self._updateFilter()
-
-    def _copyIconText(self):
+        
+    def updatStatusBarMessage(self) :
         """
         Copy the name of the currently selected icon to the clipboard.
+        then show a message that the selected icon has been coppied to clipboard
         """
-        indexes = self._listView.selectedIndexes()
-        if not indexes:
+        self.indexes = self.icon_view.selectedIndexes()
+        if not self.indexes:
             return
-
         clipboard = QApplication.instance().clipboard()
-        clipboard.setText( indexes[0].data())
-        self.statusBar
-        self.statusBar_.showMessage( f""" { indexes[0].data() } has been coppied to your clipboard""",2000)
-
-
+        clipboard.setText( self.indexes[0].data())
+        self.statusLabel.setText(f"""<span style='color : #D90368 ;'>{ self.indexes[0].data() }</span> has been coppied to your clipboard""")
+        timer = QTimer(self)
+        timer.timeout.connect( lambda : self.statusLabel.clear() )
+        timer.start(2000)
 class IconListView(QListView):
     """
     A QListView that scales it's grid size to ensure the same number of
@@ -176,8 +230,10 @@ class IconListView(QListView):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        scrollBar = QScrollBar(self)
+        scrollBar.setObjectName("scrollBar")
+        self.setVerticalScrollBar(scrollBar)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-
     def resizeEvent(self, event):
         """
         Re-implemented to re-calculate the grid size to provide scaling icons
@@ -231,8 +287,6 @@ if __name__ == "__main__" :
     iconBrowser = QApplication(sys.argv)
     iconBrowser.setFont(QFont("arial",12))
     iconBrowser.setWindowIcon(QIcon("folder.ico"))
-    iconBrowser.setStyleSheet( qdarkstyle.load_stylesheet_pyqt5() )
     Mw = Mainwindow()
     Mw.show()
     sys.exit(iconBrowser.exec_())
-
